@@ -1,22 +1,21 @@
 
-var initmysql = require('./initmysql.js');
-var pool = initmysql.pool;
-var queryAll = initmysql.queryAll;
+const initmysql = require('./initmysql.js');
+const pool = initmysql.pool;
+const queryAll = initmysql.queryAll;
+const changeQuantityForProduct = initmysql.changeQuantityForProduct;
+
 
 const inquirer = require('inquirer');
 
-process.stdout.write("Loading products..");
+
 mainAsync();
 
 
 async function  mainAsync(){
-    const loader = setInterval(() => {
-        process.stdout.write(".")
-    }, 500);
     const allProducts = await queryAll();
-    clearInterval(loader);
+
     if(allProducts){
-        process.stdout.write('\nAvailable products: \n');
+        process.stdout.write('Available products: \n');
         console.table(allProducts);
 
         const answers = await inquirer
@@ -47,7 +46,7 @@ async function  mainAsync(){
             const loader = setInterval(() => {
                 process.stdout.write(".")
             }, 500);
-            await purchaseProduct(answers.userChoice,purchaseAmount);
+            await changeQuantityForProduct(answers.userChoice,purchaseAmount);
             clearInterval(loader);
             console.log("\nPurchase successful! Total cost of purchase: $",selectedProduct.price * purchaseAmount);
         }else{
@@ -76,44 +75,6 @@ async function  mainAsync(){
 
 
 
-function purchaseProduct(item_id,quantity){
-    return new Promise(async (resolve,reject)=>{
-        const connection = await pool.getConnection();
-        //TODO promisify
-        connection.beginTransaction(function(err) {
-            if (err) { reject(err); }
-            connection.query('SELECT * FROM ?? WHERE ? LIMIT 1', ["products",{item_id:item_id}], function (error, results, fields) {
-                if (error) {
-                    resolve (connection.rollback(function() {
-                    reject(error);
-                    }));
-                }
-                
-                let q = connection.query('UPDATE ?? SET ? WHERE ?', ["products",{stock_quantity:results[0].stock_quantity - quantity},{item_id:item_id}], function (error, results, fields) {
-                if (error) {
-                    console.log(q.sql);
-                    
-                    resolve (connection.rollback(function() {
-                        reject(error);
-                    }));
-                }
-                
-                connection.commit(function(err) {
-                    if (err) {
-                        resolve (connection.rollback(function() {
-                        reject(err);
-                        }));
-                    }
-                    connection.end();
-                    resolve(true);
-                    
-                });
-              });
-            });
-          });
-          
-    })
-}
 
 
 
