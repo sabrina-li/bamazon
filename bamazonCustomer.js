@@ -4,12 +4,9 @@ const mysqlutils = require('./mysqlutils.js')
 , pool = mysqlutils.pool
 , queryAll = mysqlutils.queryAll
 , changeQuantityForProduct = mysqlutils.changeQuantityForProduct
-, queryLowInventory = mysqlutils.queryLowInventory
-, addNewProductToDB = mysqlutils.addNewProductToDB
 , setLoader = mysqlutils.setLoader
 , cancelLoader = mysqlutils.cancelLoader
 
-const inquirer = require('inquirer');
 
 
 mainAsync();
