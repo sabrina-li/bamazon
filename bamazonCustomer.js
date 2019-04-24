@@ -1,4 +1,8 @@
-const pool = require('./initmysql');
+
+var initmysql = require('./initmysql.js');
+var pool = initmysql.pool;
+var queryAll = initmysql.queryAll;
+
 const inquirer = require('inquirer');
 
 process.stdout.write("Loading products..");
@@ -70,18 +74,7 @@ async function  mainAsync(){
 
 
 
-function queryAll(){
-    return new Promise(async(res,rej)=>{
-        try{
-            results = await pool.query('SELECT * FROM ?? ',"products")
-            res(results);
-        }catch(err){
-            console.error(err);
-            rej(err);
-        }
-        
-    })
-}
+
 
 function purchaseProduct(item_id,quantity){
     return new Promise(async (resolve,reject)=>{
@@ -121,4 +114,6 @@ function purchaseProduct(item_id,quantity){
           
     })
 }
+
+
 

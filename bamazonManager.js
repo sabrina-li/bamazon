@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const queryAll = require('./bamazon')
 
 mainAsync();
 
@@ -16,10 +17,12 @@ async function  mainAsync(){
         ]);
     switch (answers.userChoice){
         case options[0]:
+
         case options[1]:
         case options[2]:
         case options[3]:
-        case default:
+        default:
+            break;
     }
 }
 
