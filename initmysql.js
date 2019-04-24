@@ -71,6 +71,41 @@ function changeQuantityForProduct(item_id,quantity){
         
   })
 }
+
+function queryLowInventory(lowQuantity){
+  return new Promise(async(res,rej)=>{
+      try{
+          results = await pool.query('SELECT * FROM ?? WHERE stock_quantity<?',["products",lowQuantity])
+          res(results);
+      }catch(err){
+          console.error(err);
+          rej(err);
+      }
+      
+  })
+}
+
+function addNewProductToDB(productName,departmentName,price,stockQuantity){
+  return new Promise(async(res,rej)=>{
+      try{
+          results = await pool.query('INSERT INTO ?? SET ?',["products",{
+            product_name:productName,
+            department_name:departmentName,
+            price:price,
+            stock_quantity:stockQuantity
+          }])
+          res(results);
+      }catch(err){
+          console.error(err);
+          rej(err);
+      }
+      
+  })
+}
+
+
 module.exports.pool = pool;
 module.exports.queryAll = queryAll;
 module.exports.changeQuantityForProduct = changeQuantityForProduct;
+module.exports.queryLowInventory = queryLowInventory;
+module.exports.addNewProductToDB = addNewProductToDB;

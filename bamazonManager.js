@@ -1,9 +1,11 @@
 const inquirer = require('inquirer');
 
-var initmysql = require('./initmysql.js');
-var pool = initmysql.pool;
-var queryAll = initmysql.queryAll;
+const initmysql = require('./initmysql.js');
+const pool = initmysql.pool;
+const queryAll = initmysql.queryAll;
 const changeQuantityForProduct = initmysql.changeQuantityForProduct;
+const queryLowInventory = initmysql.queryLowInventory;
+const addNewProductToDB = initmysql.addNewProductToDB;
 
 mainAsync();
 
@@ -43,18 +45,7 @@ async function  mainAsync(){
 
 
 
-function queryLowInventory(lowQuantity){
-    return new Promise(async(res,rej)=>{
-        try{
-            results = await pool.query('SELECT * FROM ?? WHERE stock_quantity<?',["products",lowQuantity])
-            res(results);
-        }catch(err){
-            console.error(err);
-            rej(err);
-        }
-        
-    })
-}
+
 
 
 async function addMoreInventory(){
@@ -86,3 +77,35 @@ async function addMoreInventory(){
 
 
 
+async function addNewProduct(){
+    const answers= await inquirer
+        .prompt([
+            {
+            message:"What is the name of the product would you like to add?",
+            type:"input",
+            name:"productName",
+            validate: input => {return input.length <= 200}
+            },
+            {
+                message:"What department does this product belong to?",
+                type:"input",
+                name:"departmentName",
+                validate: input => {return input.length <= 100}
+            },
+            {
+                message:"What's the price of this item?",
+                type:"input",
+                name:"price",
+                validate: input => {return input<=999999.99 && input >=0}
+            },
+            {
+                message:"How many would you like to add?",
+                type:"input",
+                name:"stockQuantity",
+                validate: input => {return !isNaN(parseInt(input))}
+            }
+    ]);
+    await addNewProductToDB(answers.productName,answers.departmentName,answers.price,answers.stockQuantity)
+    console.log("Added Successfully!")
+
+}
