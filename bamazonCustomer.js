@@ -37,8 +37,15 @@ async function displayAllProduct(){
                 }
             ])
         const selectedProduct = allProducts.find(element => element.item_id == answers.userChoice);
-        if(selectedProduct.stock_quantity >= parseInt(answers.numOfUnit)){
-            purchaseProduct(answers.userChoice,parseInt(answers.numOfUnit));
+        const purchaseAmount = parseInt(answers.numOfUnit);
+        if(selectedProduct.stock_quantity >= purchaseAmount){
+            process.stdout.write("Purchasing..");
+            const loader = setInterval(() => {
+                process.stdout.write(".")
+            }, 500);
+            await purchaseProduct(answers.userChoice,purchaseAmount);
+            clearInterval(loader);
+            console.log("\nPurchase successful! Total cost of purchase: $",selectedProduct.price * purchaseAmount);
         }else{
             console.error("Insufficient quantity!")
         }
@@ -62,34 +69,34 @@ function queryAll(){
 }
 
 function purchaseProduct(item_id,quantity){
-
-    return new Promise(async (res,rej)=>{
+    return new Promise(async (resolve,reject)=>{
         const connection = await pool.getConnection();
         //TODO promisify
         connection.beginTransaction(function(err) {
-            if (err) { throw err; }
+            if (err) { reject(err); }
             connection.query('SELECT * FROM ?? WHERE ? LIMIT 1', ["products",{item_id:item_id}], function (error, results, fields) {
                 if (error) {
-                    return connection.rollback(function() {
-                    throw error;
-                    });
+                    resolve (connection.rollback(function() {
+                    reject(error);
+                    }));
                 }
                 
                 let q = connection.query('UPDATE ?? SET ? WHERE ?', ["products",{stock_quantity:results[0].stock_quantity - quantity},{item_id:item_id}], function (error, results, fields) {
                 if (error) {
                     console.log(q.sql);
                     
-                    return connection.rollback(function() {
-                        throw error;
-                    });
+                    resolve (connection.rollback(function() {
+                        reject(error);
+                    }));
                 }
                 
                 connection.commit(function(err) {
                     if (err) {
-                        return connection.rollback(function() {
-                        throw err;
-                        });
+                        resolve (connection.rollback(function() {
+                        reject(err);
+                        }));
                     }
+                    resolve(true);
                 });
               });
             });

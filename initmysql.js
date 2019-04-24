@@ -8,9 +8,10 @@ const pool = mysql.createPool({
     user     : 'root',
     password : 'root',
     database : 'bamazon'
-  });
+});
 
 pool.getConnection = util.promisify(pool.getConnection);
 pool.query = util.promisify(pool.query);
+
   
 module.exports = pool;
