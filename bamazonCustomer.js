@@ -2,10 +2,10 @@ const pool = require('./initmysql');
 const inquirer = require('inquirer');
 
 process.stdout.write("Loading products..");
-displayAllProduct();
+mainAsync();
 
 
-async function displayAllProduct(){
+async function  mainAsync(){
     const loader = setInterval(() => {
         process.stdout.write(".")
     }, 500);
@@ -52,6 +52,20 @@ async function displayAllProduct(){
     }else{
         console.error ("0 Product found!");
     }
+    const confirm = await inquirer
+        .prompt([
+            {
+            message:"Would you like to buy more stuff?",
+            type:"confirm",
+            name:"more"
+            }
+        ]);
+    if(confirm.more){
+        mainAsync();
+    }else{
+        console.log("Goodbye!");
+        pool.end();
+    }
 }
 
 
@@ -62,6 +76,7 @@ function queryAll(){
             results = await pool.query('SELECT * FROM ?? ',"products")
             res(results);
         }catch(err){
+            console.error(err);
             rej(err);
         }
         
@@ -96,11 +111,14 @@ function purchaseProduct(item_id,quantity){
                         reject(err);
                         }));
                     }
+                    connection.end();
                     resolve(true);
+                    
                 });
               });
             });
           });
+          
     })
 }
 
