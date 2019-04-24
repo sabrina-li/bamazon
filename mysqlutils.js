@@ -13,16 +13,26 @@ const pool = mysql.createPool({
 pool.getConnection = util.promisify(pool.getConnection);
 pool.query = util.promisify(pool.query);
 
+
+function setLoader(input){
+    process.stdout.write(input+"..");
+    const loader = setInterval(() => {
+        process.stdout.write(".")
+    }, 500);
+    return loader;
+}
+function cancelLoader(loader){
+    clearInterval(loader);
+    process.stdout.write("\n")
+}
+
 function queryAll(){
-  process.stdout.write("Loading products..");
+  
   return new Promise(async(res,rej)=>{
       try{
-          const loader = setInterval(() => {
-            process.stdout.write(".")
-          }, 500);
+          const loader = setLoader("Loading products")
           results = await pool.query('SELECT * FROM ?? ',"products");
-          clearInterval(loader);
-          process.stdout.write("\n")
+          cancelLoader(loader)
           res(results);
       }catch(err){
           console.error(err);
@@ -104,8 +114,12 @@ function addNewProductToDB(productName,departmentName,price,stockQuantity){
 }
 
 
-module.exports.pool = pool;
-module.exports.queryAll = queryAll;
-module.exports.changeQuantityForProduct = changeQuantityForProduct;
-module.exports.queryLowInventory = queryLowInventory;
-module.exports.addNewProductToDB = addNewProductToDB;
+module.exports={
+    pool : pool,
+    queryAll : queryAll,
+    changeQuantityForProduct : changeQuantityForProduct,
+    queryLowInventory : queryLowInventory,
+    addNewProductToDB : addNewProductToDB,
+    setLoader : setLoader,
+    cancelLoader : cancelLoader
+}

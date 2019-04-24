@@ -1,17 +1,19 @@
 const inquirer = require('inquirer');
 
-const initmysql = require('./initmysql.js');
-const pool = initmysql.pool;
-const queryAll = initmysql.queryAll;
-const changeQuantityForProduct = initmysql.changeQuantityForProduct;
-const queryLowInventory = initmysql.queryLowInventory;
-const addNewProductToDB = initmysql.addNewProductToDB;
+const mysqlutils = require('./mysqlutils.js')
+, pool = mysqlutils.pool
+, queryAll = mysqlutils.queryAll
+, changeQuantityForProduct = mysqlutils.changeQuantityForProduct
+, queryLowInventory = mysqlutils.queryLowInventory
+, addNewProductToDB = mysqlutils.addNewProductToDB
+, setLoader = mysqlutils.setLoader
+, cancelLoader = mysqlutils.cancelLoader
 
 mainAsync();
 
 async function  mainAsync(){
     const options = ["View Products for Sale","View Low Inventory","Add to Inventory","Add New Product"];
-
+    let loader;
     const answers = await inquirer
         .prompt([
             {
@@ -23,29 +25,44 @@ async function  mainAsync(){
         ]);
     switch (answers.userChoice){
         case options[0]:
+            loader = setLoader("Loading all products");
             const allProducts = await queryAll();
+            cancelLoader(loader);
+
             process.stdout.write('Available products: \n');
             console.table(allProducts);
             break;
         case options[1]:
+            loader = setLoader("Loading prducts with low inventory");
             const lowQuantityItems = await queryLowInventory(5);
+            cancelLoader(loader);
+
             console.table(lowQuantityItems);
             break;
         case options[2]:
-            addMoreInventory();
+            await addMoreInventory();
             break;
         case options[3]:
-            addNewProduct();
+            await addNewProduct();
             break;
         default:
             break;
     }
+    const confirm = await inquirer
+        .prompt([
+            {
+            message:"Would you like to perform more actions?",
+            type:"confirm",
+            name:"more"
+            }
+        ]);
+    if(confirm.more){
+        mainAsync();
+    }else{
+        console.log("Goodbye!");
+        pool.end();
+    }
 }
-
-
-
-
-
 
 
 async function addMoreInventory(){

@@ -1,9 +1,13 @@
+const inquirer = require('inquirer');
 
-const initmysql = require('./initmysql.js');
-const pool = initmysql.pool;
-const queryAll = initmysql.queryAll;
-const changeQuantityForProduct = initmysql.changeQuantityForProduct;
-
+const mysqlutils = require('./mysqlutils.js')
+, pool = mysqlutils.pool
+, queryAll = mysqlutils.queryAll
+, changeQuantityForProduct = mysqlutils.changeQuantityForProduct
+, queryLowInventory = mysqlutils.queryLowInventory
+, addNewProductToDB = mysqlutils.addNewProductToDB
+, setLoader = mysqlutils.setLoader
+, cancelLoader = mysqlutils.cancelLoader
 
 const inquirer = require('inquirer');
 
@@ -12,8 +16,11 @@ mainAsync();
 
 
 async function  mainAsync(){
+    let loader
+    loader = setLoader("Loading all products");
     const allProducts = await queryAll();
-
+    cancelLoader(loader);
+    
     if(allProducts){
         process.stdout.write('Available products: \n');
         console.table(allProducts);
@@ -42,12 +49,9 @@ async function  mainAsync(){
         const selectedProduct = allProducts.find(element => element.item_id == answers.userChoice);
         const purchaseAmount = parseInt(answers.numOfUnit);
         if(selectedProduct.stock_quantity >= purchaseAmount){
-            process.stdout.write("Purchasing..");
-            const loader = setInterval(() => {
-                process.stdout.write(".")
-            }, 500);
+            loader = setLoader("Purchasing");
             await changeQuantityForProduct(answers.userChoice,purchaseAmount);
-            clearInterval(loader);
+            cancelLoader(loader);
             console.log("\nPurchase successful! Total cost of purchase: $",selectedProduct.price * purchaseAmount);
         }else{
             console.error("Insufficient quantity!")
