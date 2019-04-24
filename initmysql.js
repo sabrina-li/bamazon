@@ -1,4 +1,6 @@
 const mysql = require('mysql');
+const util = require('util');
+
 const pool = mysql.createPool({
     connectionLimit: 10,
     host     : 'localhost',
@@ -8,4 +10,7 @@ const pool = mysql.createPool({
     database : 'bamazon'
   });
 
+pool.getConnection = util.promisify(pool.getConnection);
+pool.query = util.promisify(pool.query);
+  
 module.exports = pool;

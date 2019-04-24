@@ -14,5 +14,8 @@ INSERT INTO products(product_name,department_name,price,stock_quantity)
 VALUES ('macbook','electronics',2500.00,20)
 
 select * from products
+LIMIT 1
+
+
 
 
