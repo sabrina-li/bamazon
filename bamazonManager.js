@@ -7,7 +7,8 @@ const mysqlutils = require('./mysqlutils.js')
 , queryLowInventory = mysqlutils.queryLowInventory
 , addNewProductToDB = mysqlutils.addNewProductToDB
 , setLoader = mysqlutils.setLoader
-, cancelLoader = mysqlutils.cancelLoader
+, cancelLoader = mysqlutils.cancelLoader;
+
 
 mainAsync();
 

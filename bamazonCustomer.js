@@ -6,6 +6,7 @@ const mysqlutils = require('./mysqlutils.js')
 , changeQuantityForProduct = mysqlutils.changeQuantityForProduct
 , setLoader = mysqlutils.setLoader
 , cancelLoader = mysqlutils.cancelLoader
+, changeSalesForProduct = mysqlutils.changeSalesForProduct;
 
 
 
@@ -18,7 +19,7 @@ async function  mainAsync(){
     const allProducts = await queryAll();
     cancelLoader(loader);
     
-    if(allProducts){
+    if(allProducts && allProducts.length>0){
         process.stdout.write('Available products: \n');
         console.table(allProducts);
 
@@ -47,29 +48,36 @@ async function  mainAsync(){
         const purchaseAmount = parseInt(answers.numOfUnit);
         if(selectedProduct.stock_quantity >= purchaseAmount){
             loader = setLoader("Purchasing");
-            await changeQuantityForProduct(answers.userChoice,purchaseAmount);
-            cancelLoader(loader);
-            console.log("\nPurchase successful! Total cost of purchase: $",selectedProduct.price * purchaseAmount);
+            const changeQuantityPromise = changeQuantityForProduct(answers.userChoice,purchaseAmount);
+            const changeSalesPromise = changeSalesForProduct(answers.userChoice,selectedProduct.price * purchaseAmount);
+            await Promise.all([changeQuantityPromise,changeSalesPromise]).then(_=>{
+                cancelLoader(loader);
+                console.log("\nPurchase successful! Total cost of purchase: $",selectedProduct.price * purchaseAmount);
+            }).catch(err=>{
+                console.error(err);
+            });
         }else{
             console.error("Insufficient quantity!")
         }
+        const confirm = await inquirer
+            .prompt([
+                {
+                message:"Would you like to buy more stuff?",
+                type:"confirm",
+                name:"more"
+                }
+            ]);
+        if(confirm.more){
+            mainAsync();
+        }else{
+            console.log("Goodbye!");
+            pool.end();
+        }
     }else{
         console.error ("0 Product found!");
-    }
-    const confirm = await inquirer
-        .prompt([
-            {
-            message:"Would you like to buy more stuff?",
-            type:"confirm",
-            name:"more"
-            }
-        ]);
-    if(confirm.more){
-        mainAsync();
-    }else{
-        console.log("Goodbye!");
         pool.end();
     }
+    
 }
 
 

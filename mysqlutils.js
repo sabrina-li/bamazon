@@ -45,21 +45,17 @@ function queryAll(){
 
 function changeQuantityForProduct(item_id,quantity){
   return new Promise(async (resolve,reject)=>{
+    results = await pool.query('SELECT * FROM ?? ',"products");
       const connection = await pool.getConnection();
       //TODO promisify
       connection.beginTransaction(function(err) {
           if (err) { reject(err); }
           connection.query('SELECT * FROM ?? WHERE ? LIMIT 1', ["products",{item_id:item_id}], function (error, results, fields) {
               if (error) {
-                  resolve (connection.rollback(function() {
                   reject(error);
-                  }));
-              }
-              
+                  };
               let q = connection.query('UPDATE ?? SET ? WHERE ?', ["products",{stock_quantity:results[0].stock_quantity - quantity},{item_id:item_id}], function (error, results, fields) {
               if (error) {
-                  console.log(q.sql);
-                  
                   resolve (connection.rollback(function() {
                       reject(error);
                   }));
@@ -78,9 +74,44 @@ function changeQuantityForProduct(item_id,quantity){
             });
           });
         });
-        
   })
 }
+
+function changeSalesForProduct(item_id,sales){
+    return new Promise(async (resolve,reject)=>{
+
+        const connection = await pool.getConnection();
+
+
+        //TODO promisify
+        connection.beginTransaction(function(err) {
+            if (err) { reject(err); }
+            connection.query('SELECT * FROM ?? WHERE ? LIMIT 1', ["products",{item_id:item_id}], function (error, results, fields) {
+                if (error) {
+                    reject(error);
+                    };
+                let q = connection.query('UPDATE ?? SET ? WHERE ?', ["products",{product_sales:results[0].product_sales + sales},{item_id:item_id}], function (error, results, fields) {
+                if (error) {
+                    resolve (connection.rollback(function() {
+                        reject(error);
+                    }));
+                }
+                
+                connection.commit(function(err) {
+                    if (err) {
+                        resolve (connection.rollback(function() {
+                        reject(err);
+                        }));
+                    }
+                    connection.release();
+                    resolve(true);
+                    
+                });
+              });
+            });
+          });
+    })
+  }
 
 function queryLowInventory(lowQuantity){
   return new Promise(async(res,rej)=>{
@@ -121,5 +152,6 @@ module.exports={
     queryLowInventory : queryLowInventory,
     addNewProductToDB : addNewProductToDB,
     setLoader : setLoader,
-    cancelLoader : cancelLoader
+    cancelLoader : cancelLoader,
+    changeSalesForProduct : changeSalesForProduct
 }
