@@ -165,8 +165,19 @@ function salesByDepartment(){
 
 
 
-function addNewDepartmentToDB(){
-    //TODO
+function addNewDepartmentToDB(departmentName,overhead){
+    return new Promise(async(res,rej)=>{
+        try{
+            results = await pool.query(
+                `INSERT INTO ?? SET ?`,
+                ["departments",{department_name:departmentName,over_head_costs:overhead}])
+            res(results);
+        }catch(err){
+            console.error(err);
+            rej(err);
+        }
+        
+    })
 }
 
 
