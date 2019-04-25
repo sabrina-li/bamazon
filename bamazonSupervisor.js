@@ -1,4 +1,7 @@
 const inquirer = require('inquirer');
+const { green, inverse, bgLightCyan, underline, dim } = require ('ansicolor')
+const asTable = require ('as-table').configure ({ title: x => x.bgLightCyan, delimiter: ' | '.dim.cyan, dash: '-'.dim.cyan })
+
 const mysqlutils = require('./mysqlutils.js')
 , pool = mysqlutils.pool
 , queryAll = mysqlutils.queryAll
@@ -28,8 +31,11 @@ async function  mainAsync(){
             loader = setLoader("Loading all department");
             const allProducts = await salesByDepartment();
             cancelLoader(loader);
+            
+            
+            
+            console.log (asTable (allProducts));
 
-            console.table(allProducts);
             break;
         case options[1]:
             

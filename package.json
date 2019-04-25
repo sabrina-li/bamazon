@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/sabrina-li/bamazon#readme",
   "dependencies": {
+    "ansicolor": "^1.1.83",
+    "as-table": "^1.0.38",
+    "cli-table": "^0.3.1",
     "inquirer": "^6.3.1",
     "mysql": "^2.17.1"
   }
