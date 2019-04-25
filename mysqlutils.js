@@ -34,7 +34,6 @@ function queryAll(){
           results = await pool.query(`SELECT p.item_id,p.product_name,d.department_name,p.price,p.stock_quantity FROM ?? p JOIN ?? d ON ?? = ??`,
           ["products","departments","p.department_id","d.department_id"]);
           cancelLoader(loader)
-          console.log(results.sql)
           res(results);
       }catch(err){
           console.error(err);
@@ -181,5 +180,6 @@ module.exports={
     setLoader : setLoader,
     cancelLoader : cancelLoader,
     changeSalesForProduct : changeSalesForProduct,
-    salesByDepartment : salesByDepartment
+    salesByDepartment : salesByDepartment,
+    addNewDepartmentToDB : addNewDepartmentToDB
 }

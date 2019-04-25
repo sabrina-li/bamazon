@@ -34,7 +34,6 @@ config = {
 
 function makeTable(data){
 
-    console.log(data);
     tableData = [];
     tableData.push(Object.keys(data[0]));
     tableData = tableData.concat(data.map(ele=>Object.values(ele)));

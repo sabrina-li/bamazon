@@ -8,7 +8,8 @@ const mysqlutils = require('./mysqlutils.js')
 , setLoader = mysqlutils.setLoader
 , cancelLoader = mysqlutils.cancelLoader
 , changeSalesForProduct = mysqlutils.changeSalesForProduct
-, salesByDepartment = mysqlutils.salesByDepartment;
+, salesByDepartment = mysqlutils.salesByDepartment
+, addNewDepartmentToDB = mysqlutils.addNewDepartmentToDB;
 
 
 mainAsync();
@@ -32,11 +33,7 @@ async function  mainAsync(){
             cancelLoader(loader);
             
         if(allProducts && allProducts.length>0){
-            tableData = [];
-            tableData.push(Object.keys(allProducts[0]));
-            tableData = tableData.concat(allProducts.map(ele=>Object.values(ele)));
-
-            console.log(makeTable(tableData));
+            console.log(makeTable(allProducts));
         }
             break;
         case options[1]:
