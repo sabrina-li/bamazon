@@ -30,9 +30,11 @@ function queryAll(){
   
   return new Promise(async(res,rej)=>{
       try{
-          const loader = setLoader("Loading products")
-          results = await pool.query('SELECT * FROM ?? ',"products");
+          const loader = setLoader("Loading all products")
+          results = await pool.query(`SELECT p.item_id,p.product_name,d.department_name,p.price,p.stock_quantity FROM ?? p JOIN ?? d ON ?? = ??`,
+          ["products","departments","p.department_id","d.department_id"]);
           cancelLoader(loader)
+          console.log(results.sql)
           res(results);
       }catch(err){
           console.error(err);
@@ -129,15 +131,11 @@ function queryLowInventory(lowQuantity){
 function addNewProductToDB(productName,departmentName,price,stockQuantity){
   return new Promise(async(res,rej)=>{
       try{
-          results = await pool.query('INSERT INTO ?? SET ?',["products",{
-            product_name:productName,
-            department_name:departmentName,
-            price:price,
-            stock_quantity:stockQuantity
-          }])
+          results = await pool.query('CALL ?? (?,?,?,?) ',
+          ["insertNewProduct",productName,departmentName,price,stockQuantity])
           res(results);
       }catch(err){
-          console.error(err);
+          console.error(err.sqlMessage);
           rej(err);
       }
       
@@ -164,6 +162,15 @@ function salesByDepartment(){
         
     })
   }
+
+
+
+
+function addNewDepartmentToDB(){
+    //TODO
+}
+
+
 
 module.exports={
     pool : pool,

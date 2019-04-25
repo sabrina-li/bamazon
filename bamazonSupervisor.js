@@ -1,6 +1,5 @@
 const inquirer = require('inquirer');
-const { green, inverse, bgLightCyan, underline, dim } = require ('ansicolor')
-const asTable = require ('as-table').configure ({ title: x => x.bgLightCyan, delimiter: ' | '.dim.cyan, dash: '-'.dim.cyan })
+const {makeTable} = require('./makeTable');
 
 const mysqlutils = require('./mysqlutils.js')
 , pool = mysqlutils.pool
@@ -32,13 +31,16 @@ async function  mainAsync(){
             const allProducts = await salesByDepartment();
             cancelLoader(loader);
             
-            
-            
-            console.log (asTable (allProducts));
+        if(allProducts && allProducts.length>0){
+            tableData = [];
+            tableData.push(Object.keys(allProducts[0]));
+            tableData = tableData.concat(allProducts.map(ele=>Object.values(ele)));
 
+            console.log(makeTable(tableData));
+        }
             break;
         case options[1]:
-            
+            await addDepartment();
         default:
             break;
     }
@@ -57,3 +59,31 @@ async function  mainAsync(){
         pool.end();
     }
 }
+
+
+async function addDepartment(){
+
+
+    const answers= await inquirer
+        .prompt([
+            {
+            message:"What is the name of the department would you like to add?",
+            type:"input",
+            name:"departmentName",
+            validate: input => {return input.length <= 100}
+            },
+            {
+                message:"What is the overhead cost of the Department?",
+                type:"input",
+                name:"overhead",
+                validate: input => {return !isNaN(parseFloat(input))}
+            }
+    ]);
+    await addNewDepartmentToDB(answers.departmentName,answers.overhead)
+    console.log("Added Successfully!")
+
+
+}
+
+
+

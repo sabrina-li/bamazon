@@ -19,6 +19,4 @@ VALUES ('shorts',1,27.59,100),
 
 
 SELECT * FROM products;
-SELECT * FROM departments;
-
-
+SELECT * FROM departments	;

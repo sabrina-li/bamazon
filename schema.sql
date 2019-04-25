@@ -21,7 +21,7 @@ over_head_costs INT NOT NULL
 
 ALTER TABLE products
 ADD COLUMN product_sales FLOAT NOT NULL DEFAULT 0,
-CHANGE COLUMN department_name department_id INT,
+CHANGE COLUMN department_name department_id INT NOT NULL,
 ADD CONSTRAINT FK_DepartmentID
 FOREIGN KEY (department_id) REFERENCES departments(department_id);
 

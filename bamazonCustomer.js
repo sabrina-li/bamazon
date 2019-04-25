@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const {makeTable} = require('./makeTable');
 
 const mysqlutils = require('./mysqlutils.js')
 , pool = mysqlutils.pool
@@ -6,7 +7,8 @@ const mysqlutils = require('./mysqlutils.js')
 , changeQuantityForProduct = mysqlutils.changeQuantityForProduct
 , setLoader = mysqlutils.setLoader
 , cancelLoader = mysqlutils.cancelLoader
-, changeSalesForProduct = mysqlutils.changeSalesForProduct;
+, changeSalesForProduct = mysqlutils.changeSalesForProduct
+
 
 
 
@@ -14,14 +16,11 @@ mainAsync();
 
 
 async function  mainAsync(){
-    let loader
-    loader = setLoader("Loading all products");
     const allProducts = await queryAll();
-    cancelLoader(loader);
     
     if(allProducts && allProducts.length>0){
         process.stdout.write('Available products: \n');
-        console.table(allProducts);
+        console.log(makeTable(allProducts));
 
         const answers = await inquirer
             .prompt([

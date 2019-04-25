@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const {makeTable} = require('./makeTable');
 
 const mysqlutils = require('./mysqlutils.js')
 , pool = mysqlutils.pool
@@ -31,14 +32,15 @@ async function  mainAsync(){
             cancelLoader(loader);
 
             process.stdout.write('Available products: \n');
-            console.table(allProducts);
+            console.log(makeTable(allProducts));
             break;
         case options[1]:
             loader = setLoader("Loading prducts with low inventory");
             const lowQuantityItems = await queryLowInventory(5);
             cancelLoader(loader);
+            
+            console.log(makeTable(lowQuantityItems));
 
-            console.table(lowQuantityItems);
             break;
         case options[2]:
             await addMoreInventory();
