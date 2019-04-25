@@ -148,12 +148,14 @@ function addNewProductToDB(productName,departmentName,price,stockQuantity){
 function salesByDepartment(){
     return new Promise(async(res,rej)=>{
         try{
-            results = await pool.query('INSERT INTO ?? SET ?',["products",{
-              product_name:productName,
-              department_name:departmentName,
-              price:price,
-              stock_quantity:stockQuantity
-            }])
+            results = await pool.query(
+                `SELECT d.*,sum(p.product_sales) AS product_sales
+                ,(sum(p.product_sales) - over_head_costs) AS total_profit
+                FROM ?? d
+                INNER JOIN ?? p ON d.department_id = p.department_id
+                group by d.department_id
+                ORDER BY product_sales DESC`,
+                ["departments","products"])
             res(results);
         }catch(err){
             console.error(err);
