@@ -145,6 +145,24 @@ function addNewProductToDB(productName,departmentName,price,stockQuantity){
 }
 
 
+function salesByDepartment(){
+    return new Promise(async(res,rej)=>{
+        try{
+            results = await pool.query('INSERT INTO ?? SET ?',["products",{
+              product_name:productName,
+              department_name:departmentName,
+              price:price,
+              stock_quantity:stockQuantity
+            }])
+            res(results);
+        }catch(err){
+            console.error(err);
+            rej(err);
+        }
+        
+    })
+  }
+
 module.exports={
     pool : pool,
     queryAll : queryAll,
@@ -153,5 +171,6 @@ module.exports={
     addNewProductToDB : addNewProductToDB,
     setLoader : setLoader,
     cancelLoader : cancelLoader,
-    changeSalesForProduct : changeSalesForProduct
+    changeSalesForProduct : changeSalesForProduct,
+    salesByDepartment : salesByDepartment
 }

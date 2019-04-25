@@ -54,6 +54,7 @@ async function  mainAsync(){
                 cancelLoader(loader);
                 console.log("\nPurchase successful! Total cost of purchase: $",selectedProduct.price * purchaseAmount);
             }).catch(err=>{
+                console.log("\nPurchase faled with error!");
                 console.error(err);
             });
         }else{
