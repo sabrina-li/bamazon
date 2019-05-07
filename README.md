@@ -13,11 +13,15 @@ Supervisor - Allow supervisor to track product sales across your store's departm
 
 ## Getting Started
 ------
-run `npm i` to install dependencies
+- Run `npm i` to install dependencies
 
-spin up MySQL server and run `schema.sql` to create schema
+- Spin up MySQL server and run `schema.sql` to create database and schema, switch to the brand new bamazon_db
 
-Add your MySQL information to `mysqlutils.js`:
+- Run `seed.sql` to fill products and departments table data or create your own product/departments data
+
+- Run `insertNewProduct.sql` to create required stored procedure
+
+- Add your MySQL information to `mysqlutils.js`:
 
 ```
 const pool = mysql.createPool({
@@ -30,11 +34,7 @@ const pool = mysql.createPool({
 });
 ```
 
-run `seed.sql` to fill products and departments table data or create your own product/departments data
-
-run `insertNewProduct.sql` to create required stored procedure
-
-You are good to go!
+- You are good to go!
 
 ## Usage
 ------
